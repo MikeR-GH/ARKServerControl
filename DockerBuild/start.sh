@@ -6,8 +6,6 @@ LOG_DIRECTORY="/ArkSurvivalEvolved/StartupLogs"
 MINIMAL_RUNNING_TIME=10
 NORMAL_MINIMAL_RUNNING_TIME=60
 
-env TZ="Europe/Berlin"
-
 #### Cache
 if [ ! -v START_TIME ]; then
 	START_TIME="$(date +%s)"

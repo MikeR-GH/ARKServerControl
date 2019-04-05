@@ -1,0 +1,26 @@
+# Paths are based on directory "Servers/{.*}/"
+
+version: "2.4"
+services:
+  ARKServer:
+    build: ../../DockerBuild
+    image: arksurvivalevolved
+    ulimits:
+      nofile:
+        soft: 100000
+        hard: 100000
+    env_file:
+      - ./.env
+    volumes:
+      - ARKServerFiles:/ArkSurvivalEvolved:rw
+      - ../../ClustersTransfers:/ArkSurvivalEvolved/ShooterGame/Clusters:rw
+      - ./Saved:/ArkSurvivalEvolved/ShooterGame/Saved:rw
+      - ./StartupLogs:/ArkSurvivalEvolved/StartupLogs:rw
+    ports:
+      - ${ARKSERVER_PUBLICIP:?ARKSERVER_PUBLICIP}:${ARKSERVER_PORT:?ARKSERVER_PORT}:${ARKSERVER_PORT:?ARKSERVER_PORT}/udp
+      - ${ARKSERVER_PUBLICIP:?ARKSERVER_PUBLICIP}:${ARKSERVER_PORTPLUS:?ARKSERVER_PORTPLUS}:${ARKSERVER_PORTPLUS:?ARKSERVER_PORTPLUS}/udp
+      - ${ARKSERVER_PUBLICIP:?ARKSERVER_PUBLICIP}:${ARKSERVER_QUERYPORT:?ARKSERVER_QUERYPORT}:${ARKSERVER_QUERYPORT:?ARKSERVER_QUERYPORT}/udp
+      - ${ARKSERVER_PUBLICIP:?ARKSERVER_PUBLICIP}:${ARKSERVER_RCONPORT:?ARKSERVER_RCONPORT}:${ARKSERVER_RCONPORT:?ARKSERVER_RCONPORT}/tcp
+
+volumes:
+  ARKServerFiles:

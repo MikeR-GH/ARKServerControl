@@ -12,10 +12,10 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ARKServerFiles:/ArkSurvivalEvolved:rw
-      - ../../ClustersTransfers:/ArkSurvivalEvolved/ShooterGame/Clusters:rw
-      - ./Saved:/ArkSurvivalEvolved/ShooterGame/Saved:rw
-      - ./StartupLogs:/ArkSurvivalEvolved/StartupLogs:rw
+      - ARKServerFiles:/ARK/Server:rw
+      - ../../ClustersTransfers:/ARK/Server/ShooterGame/Clusters:rw
+      - ./Saved:/ARK/Server/ShooterGame/Saved:rw
+      - ./StartupLogs:/ARK/Server/StartupLogs:rw
     ports:
       - ${ARKSERVER_PUBLICIP:?ARKSERVER_PUBLICIP}:${ARKSERVER_PORT:?ARKSERVER_PORT}:${ARKSERVER_PORT:?ARKSERVER_PORT}/udp
       - ${ARKSERVER_PUBLICIP:?ARKSERVER_PUBLICIP}:${ARKSERVER_PORTPLUS:?ARKSERVER_PORTPLUS}:${ARKSERVER_PORTPLUS:?ARKSERVER_PORTPLUS}/udp

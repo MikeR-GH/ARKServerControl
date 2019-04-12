@@ -1,7 +1,7 @@
 #!/bin/bash
 
 EFFECTIVE_TARGET_USER="steam"
-LOG_DIRECTORY="/ArkSurvivalEvolved/StartupLogs"
+LOG_DIRECTORY="/ARK/Server/StartupLogs"
 
 MINIMAL_RUNNING_TIME=10
 NORMAL_MINIMAL_RUNNING_TIME=60
@@ -23,8 +23,8 @@ function printlog() { # Params: MESSAGE
 }
 
 if [ $(id -u) -eq 0 ]; then
-	printlog "chown: /ArkSurvivalEvolved"
-	chown -R ${EFFECTIVE_TARGET_USER}: /ArkSurvivalEvolved
+	printlog "chown: /ARK"
+	chown -R ${EFFECTIVE_TARGET_USER}: /ARK
 
 	printlog "Updating ARKSurvivalEvolved.."
 	UPDATING_START=`date +%s`
@@ -45,15 +45,15 @@ if [ $(id -u) -eq 0 ]; then
 		exit 3
 	fi
 
-	if [ ! -h "/ArkSurvivalEvolved/Engine/Binaries/ThirdParty/SteamCMD/Linux" ]; then
-		if [ -e "/ArkSurvivalEvolved/Engine/Binaries/ThirdParty/SteamCMD/Linux" ]; then
-			rm -rf "/ArkSurvivalEvolved/Engine/Binaries/ThirdParty/SteamCMD/Linux"
+	if [ ! -h "/ARK/Server/Engine/Binaries/ThirdParty/SteamCMD/Linux" ]; then
+		if [ -e "/ARK/Server/Engine/Binaries/ThirdParty/SteamCMD/Linux" ]; then
+			rm -rf "/ARK/Server/Engine/Binaries/ThirdParty/SteamCMD/Linux"
 		fi
-		ln -s /SteamCMD /ArkSurvivalEvolved/Engine/Binaries/ThirdParty/SteamCMD/Linux
+		ln -s /SteamCMD /ARK/Server/Engine/Binaries/ThirdParty/SteamCMD/Linux
 	fi
 
-	printlog "chown: /ArkSurvivalEvolved"
-	chown -R ${EFFECTIVE_TARGET_USER}: /ArkSurvivalEvolved
+	printlog "chown: /ARK"
+	chown -R ${EFFECTIVE_TARGET_USER}: /ARK
 fi
 
 if [ "$(whoami)" != "${EFFECTIVE_TARGET_USER}" ]; then
@@ -90,7 +90,7 @@ if [ ! -v ARKSERVER_MAXPLAYERS ]; then
 	ARKSERVER_MAXPLAYERS=70
 fi
 
-COMMANDLINE="/ArkSurvivalEvolved/ShooterGame/Binaries/Linux/ShooterGameServer"
+COMMANDLINE="/ARK/Server/ShooterGame/Binaries/Linux/ShooterGameServer"
 COMMANDLINE="${COMMANDLINE} \""
 COMMANDLINE="${COMMANDLINE}${ARKSERVER_MAP}"
 COMMANDLINE="${COMMANDLINE}?listen"

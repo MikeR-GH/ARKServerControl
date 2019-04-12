@@ -28,9 +28,9 @@ RUN set -x \
 	&& chown -R steam: /SteamCMD \
 	&& sudo -u steam /SteamCMD/steamcmd.sh +quit \
 	
-	# Ensuring ArkSurvivalEvolved-Directory
-	&& mkdir -p /ArkSurvivalEvolved \
-	&& chown -R steam: /ArkSurvivalEvolved \
+	# Ensuring '/ARK/Server'-Directory
+	&& mkdir -p /ARK/Server \
+	&& chown -R steam: /ARK/Server \
 	
 	# Cleanup
 	&& apt-get clean autoclean \
@@ -40,6 +40,7 @@ RUN set -x \
 COPY ./sysctl.conf /etc/sysctl.conf
 COPY ./limits.conf /etc/security/limits.conf
 COPY ./common-session /etc/pam.d/common-session
-COPY ./start.sh /ArkSurvivalEvolved.sh
 
-CMD ["/ArkSurvivalEvolved.sh"]
+COPY ./Server.sh /ARK/Server.sh
+
+CMD ["/ARK/Server.sh"]

@@ -144,6 +144,8 @@ if [ "${TIME_LEFT_NORMAL}" -ge 0 ]; then
         printlog "ARKServer only ran for ${RUNNING_TIME} seconds. It seems it didn't start up correctly."
 fi
 
+: ' Prevent Docker from restarting the container when it exits too quickly '
+
 TIME_LEFT="$((${MINIMAL_RUNNING_TIME} - ${RUNNING_TIME}))"
 if [ "${TIME_LEFT}" -ge 0 ]; then
 	printlog "Sleeping ${TIME_LEFT} seconds"

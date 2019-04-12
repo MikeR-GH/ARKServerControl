@@ -8,7 +8,7 @@ NORMAL_MINIMAL_RUNNING_TIME=60
 
 #### Cache
 if [ ! -v START_TIME ]; then
-	START_TIME="$(date +%s)"
+	START_TIME=`date +%s`
 fi
 if [ ! -v LOG_FILE ]; then
 	LOG_FILE="$(date +'%Y-%m-%d_%H-%M-%S').log"
@@ -27,7 +27,7 @@ if [ $(id -u) -eq 0 ]; then
 	chown -R ${EFFECTIVE_TARGET_USER}: /ArkSurvivalEvolved
 
 	printlog "Updating ARKSurvivalEvolved.."
-	UPDATING_START="$(date +%s)"
+	UPDATING_START=`date +%s`
 	sudo -u ${EFFECTIVE_TARGET_USER} /SteamCMD/steamcmd.sh \
 		+@ShutdownOnFailedCommand 1 \
 		+@NoPromptForPassword 1 \

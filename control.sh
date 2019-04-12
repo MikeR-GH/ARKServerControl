@@ -1,9 +1,11 @@
 #!/bin/bash
 
+: ' >>> ADVANCED-SETUP <<< '
+
 PROJECT_NAME="ARKCluster"
 SERVERS_BASEDIR="Servers"
 
-
+: ' >>> SCRIPT-SETUP <<< ' # // DONT CHANGE THE FOLLOWING..
 
 ARKSERVERCONTROL_NAME="ARKServerControl"
 ARKSERVERCONTROL_VERSION="0.1"
@@ -27,6 +29,8 @@ COLOR_BOLD="$(tput bold 2>/dev/null)"
 
 COLOR_RESET="$(tput sgr0 2>/dev/null)"
 
+BINDIR=$(dirname "$(readlink -fn "$0")")
+cd "$BINDIR"
 
 function isvalidserver() { # Params: SERVER
 	[ -f "${SERVERS_BASEDIR}/${1}/.env" ]
@@ -55,6 +59,8 @@ elif [ "${1}" == "list" ]; then
 			echo "${COLOR_WHITE}${COLOR_BOLD}  - ${COLOR_BLUE}$(basename $dir)${COLOR_RESET}"
 		fi
 	done
+elif [ "${1}" == "build" ]; then
+	 docker build --rm $(if [ "${2}" == "no-cache" ]; then echo "--no-cache"; fi) -t arksurvivalevolved DockerBuild/
 elif [ "${1}" == "all" ]; then
 	if [[ -z "${@:2}" ]]; then
 		dockercmp_all ps

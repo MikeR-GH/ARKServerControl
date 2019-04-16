@@ -13,9 +13,10 @@ services:
       - ./.env
     volumes:
       - ARKServerFiles:/ARK/Server:rw
-      - ../../ClustersTransfers:/ARK/Server/ShooterGame/Clusters:rw
+      - ../../ClustersTransfers:/ARK/Server/ShooterGame/ClustersTransfers:rw
       - ./Saved:/ARK/Server/ShooterGame/Saved:rw
       - ./StartupLogs:/ARK/Server/StartupLogs:rw
+      - ./ConfigOverride:/ARK/Server/ConfigOverride:rw
     ports:
       - ${ARKSERVER_PUBLICIP:?ARKSERVER_PUBLICIP}:${ARKSERVER_PORT:?ARKSERVER_PORT}:${ARKSERVER_PORT:?ARKSERVER_PORT}/udp
       - ${ARKSERVER_PUBLICIP:?ARKSERVER_PUBLICIP}:${ARKSERVER_PORTPLUS:?ARKSERVER_PORTPLUS}:${ARKSERVER_PORTPLUS:?ARKSERVER_PORTPLUS}/udp

@@ -4,6 +4,7 @@
 
 PROJECT_NAME="ARKCluster"
 SERVERS_BASEDIR="Servers"
+BACKUPS_BASEDIR="Backups"
 
 : ' >>> SCRIPT-SETUP <<< ' # // DONT CHANGE THE FOLLOWING..
 
@@ -38,7 +39,10 @@ function isvalidserver() { # Params: SERVER
 function dockercmp() { # Params: SERVER COMMAND
 	if isvalidserver "${1}"; then
 		docker-compose -f docker-compose.yml -p ${PROJECT_NAME}_${1} --project-directory ${SERVERS_BASEDIR}/${1} ${@:2}
+		return ${?}
 	fi
+
+	return 1
 }
 function dockercmp_all() { # Params: COMMAND
 	for dir in ${SERVERS_BASEDIR}/*; do
@@ -47,11 +51,27 @@ function dockercmp_all() { # Params: COMMAND
 		fi
 	done
 }
+function backupserver() { # Params: SERVER
+	if isvalidserver "${1}"; then
+		mkdir -p "${BACKUPS_BASEDIR}/${1}"
+		tar -zcvf "${BACKUPS_BASEDIR}/${1}/`date +'%Y-%m-%d_%H-%M-%S'`.tar.gz" -C "${SERVERS_BASEDIR}" "${1}"
+		return ${?}
+	fi
+
+	return 1
+}
+function backupserver_all() { # Params:
+	for dir in ${SERVERS_BASEDIR}/*; do
+		if isvalidserver "$(basename ${dir})"; then
+			backupserver "$(basename ${dir})"
+		fi
+	done
+}
 
 echo -e "${COLOR_CYAN}${COLOR_BOLD}===   ${ARKSERVERCONTROL_NAME} v${ARKSERVERCONTROL_VERSION}; Project: ${COLOR_RED}${PROJECT_NAME}${COLOR_CYAN};   ===${COLOR_RESET}\n"
 
 if [ "${1}" == "--help" ] || [ -z "${1}" ]; then
-	echo "${COLOR_WHITE}${COLOR_BOLD}${0} [--help|list|[all|<Servername>] <docker-compose command>]${COLOR_RESET}"
+	echo "${COLOR_WHITE}${COLOR_BOLD}${0} [--help|list|build|backup[all|<Servername>]|[all|<Servername>] <docker-compose command>]${COLOR_RESET}"
 elif [ "${1}" == "list" ]; then
 	echo "${COLOR_WHITE}${COLOR_BOLD}List of all Servers:${COLOR_RESET}"
 	for dir in ${SERVERS_BASEDIR}/*; do
@@ -61,6 +81,12 @@ elif [ "${1}" == "list" ]; then
 	done
 elif [ "${1}" == "build" ]; then
 	 docker build --rm $(if [ "${2}" == "no-cache" ]; then echo "--no-cache"; fi) -t arksurvivalevolved DockerBuild/
+elif [ "${1}" == "backup" ]; then
+	if [ "${2}" == "all" ]; then
+		backupserver_all
+	else
+		backupserver "${2}"
+	fi
 elif [ "${1}" == "all" ]; then
 	if [[ -z "${@:2}" ]]; then
 		dockercmp_all ps

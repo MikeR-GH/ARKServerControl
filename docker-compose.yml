@@ -13,7 +13,7 @@ services:
       - ./.env
     volumes:
       - ARKServerFiles:/ARK/Server:rw
-      - ../../ClustersTransfers:/ARK/Server/ShooterGame/ClustersTransfers:rw
+      - ../../ClusterTransfers:/ARK/Server/ShooterGame/ClusterTransfers:rw
       - ./Saved:/ARK/Server/ShooterGame/Saved:rw
       - ./StartupLogs:/ARK/Server/StartupLogs:rw
       - ./ConfigOverride:/ARK/Server/ConfigOverride:rw

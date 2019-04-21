@@ -136,6 +136,9 @@ COMMANDLINE="${COMMANDLINE}?listen"
 COMMANDLINE="${COMMANDLINE}?bRawSockets"
 COMMANDLINE="${COMMANDLINE}?Port=${ARKSERVER_PORT}"
 COMMANDLINE="${COMMANDLINE}?QueryPort=${ARKSERVER_QUERYPORT}"
+if [ -n "${ARKSERVER_MODIDS}" ]; then
+	COMMANDLINE="${COMMANDLINE}?GameModIds=${ARKSERVER_MODIDS}"
+fi
 COMMANDLINE="${COMMANDLINE}?RCONEnabled=${ARKSERVER_RCONENABLED}"
 
 if [ "${ARKSERVER_RCONENABLED}" == "True" ] || [ "${ARKSERVER_RCONENABLED}" == "true" ]; then
@@ -158,7 +161,7 @@ COMMANDLINE="${COMMANDLINE}\""
 if [ -v ARKSERVER_CLUSTERID ]; then
 	printlog "[DBUG] Enabling Cluster (ID: '${ARKSERVER_CLUSTERID}')"
         COMMANDLINE="${COMMANDLINE} -NoTransferFromFiltering"
-	COMMANDLINE="${COMMANDLINE} -ClusterDirOverride=/ARK/Server/ShooterGame/ClusterTransfer"
+	COMMANDLINE="${COMMANDLINE} -ClusterDirOverride=/ARK/Server/ShooterGame/ClusterTransfers"
         COMMANDLINE="${COMMANDLINE} -clusterid=${ARKSERVER_CLUSTERID}"
 fi
 

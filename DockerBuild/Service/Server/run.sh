@@ -33,6 +33,7 @@ if [ -f "${CONFIG_FILE}" ]; then
 	eval "`. ${CONFIG_FILE}&>/dev/null
 	[ -v ARKSERVER_SKIPUPDATE ] && declare -p ARKSERVER_SKIPUPDATE 2>/dev/null
 	[ -v ARKSERVER_MAP ] && declare -p ARKSERVER_MAP 2>/dev/null
+	[ -v ARKSERVER_RAWSOCKETS ] && declare -p ARKSERVER_RAWSOCKETS 2>/dev/null
 	[ -v ARKSERVER_MAXPLAYERS ] && declare -p ARKSERVER_MAXPLAYERS 2>/dev/null
 	[ -v ARKSERVER_CLUSTERID ] && declare -p ARKSERVER_CLUSTERID 2>/dev/null
 	[ -v ARKSERVER_MODIDS ] && declare -p ARKSERVER_MODIDS 2>/dev/null
@@ -133,7 +134,11 @@ COMMANDLINE="/ARK/Server/ShooterGame/Binaries/Linux/ShooterGameServer"
 COMMANDLINE="${COMMANDLINE} \""
 COMMANDLINE="${COMMANDLINE}${ARKSERVER_MAP}"
 COMMANDLINE="${COMMANDLINE}?listen"
-COMMANDLINE="${COMMANDLINE}?bRawSockets"
+
+if [ "${ARKSERVER_RAWSOCKETS}" == "True" ] || [ "${ARKSERVER_RAWSOCKETS}" == "true" ]; then
+	COMMANDLINE="${COMMANDLINE}?bRawSockets"
+fi
+
 COMMANDLINE="${COMMANDLINE}?Port=${ARKSERVER_PORT}"
 COMMANDLINE="${COMMANDLINE}?QueryPort=${ARKSERVER_QUERYPORT}"
 if [ -n "${ARKSERVER_MODIDS}" ]; then

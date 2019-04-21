@@ -38,6 +38,7 @@ printlog "[DBUG] Exporting Commandline-Configuration"
 
 [ -v ARKSERVER_SKIPUPDATE ] && declare -p ARKSERVER_SKIPUPDATE 2>/dev/null >>${CONFIG_FILE}
 [ -v ARKSERVER_MAP ] && declare -p ARKSERVER_MAP 2>/dev/null >>${CONFIG_FILE}
+[ -v ARKSERVER_RAWSOCKETS ] && declare -p ARKSERVER_RAWSOCKETS 2>/dev/null >>${CONFIG_FILE}
 [ -v ARKSERVER_MAXPLAYERS ] && declare -p ARKSERVER_MAXPLAYERS 2>/dev/null >>${CONFIG_FILE}
 [ -v ARKSERVER_CLUSTERID ] && declare -p ARKSERVER_CLUSTERID 2>/dev/null >>${CONFIG_FILE}
 [ -v ARKSERVER_MODIDS ] && declare -p ARKSERVER_MODIDS 2>/dev/null >>${CONFIG_FILE}

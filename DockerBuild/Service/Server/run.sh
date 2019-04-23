@@ -44,7 +44,7 @@ if [ -f "${CONFIG_FILE}" ]; then
 	[ -v ARKSERVER_RCONPORT ] && declare -p ARKSERVER_RCONPORT 2>/dev/null`"
 fi
 
-if [ "${ARKSERVER_SKIPUPDATE}" == true ]; then
+if [ "${ARKSERVER_SKIPUPDATE}" == "True" ] || [ "${ARKSERVER_SKIPUPDATE}" == "true" ]; then
 	printlog "[INFO] Skipping Update due to configuration"
 else
 	printlog "[INFO] Updating ARK-Server"

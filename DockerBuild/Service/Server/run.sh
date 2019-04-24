@@ -44,7 +44,7 @@ if [ -f "${CONFIG_FILE}" ]; then
 	[ -v ARKSERVER_RCONPORT ] && declare -p ARKSERVER_RCONPORT 2>/dev/null`"
 fi
 
-if [ "${ARKSERVER_SKIPUPDATE}" == "True" ] || [ "${ARKSERVER_SKIPUPDATE}" == "true" ]; then
+if [ "${ARKSERVER_SKIPUPDATE}" == true ] || [ "${ARKSERVER_SKIPUPDATE}" == "True" ] || [ "${ARKSERVER_SKIPUPDATE}" == "true" ]; then
 	printlog "[INFO] Skipping Update due to configuration"
 else
 	printlog "[INFO] Updating ARK-Server"
@@ -121,7 +121,7 @@ if [ ! -v ARKSERVER_RCONENABLED ]; then
         printlog "[DBUG] Returning to default 'ARKSERVER_RCONENABLED=False'"
         ARKSERVER_RCONENABLED=False
 fi
-if [ ! -v ARKSERVER_RCONPORT ] && ([ "${ARKSERVER_RCONENABLED}" == "True" ] || [ "${ARKSERVER_RCONENABLED}" == "true" ]); then
+if [ ! -v ARKSERVER_RCONPORT ] && ([ "${ARKSERVER_RCONENABLED}" == true ] || [ "${ARKSERVER_RCONENABLED}" == "True" ] || [ "${ARKSERVER_RCONENABLED}" == "true" ]); then
         printlog "[DBUG] Returning to default 'ARKSERVER_RCONPORT=27020'"
         ARKSERVER_RCONPORT=27020
 fi
@@ -135,7 +135,7 @@ COMMANDLINE="${COMMANDLINE} \""
 COMMANDLINE="${COMMANDLINE}${ARKSERVER_MAP}"
 COMMANDLINE="${COMMANDLINE}?listen"
 
-if [ "${ARKSERVER_RAWSOCKETS}" == "True" ] || [ "${ARKSERVER_RAWSOCKETS}" == "true" ]; then
+if [ "${ARKSERVER_RAWSOCKETS}" == true ] || [ "${ARKSERVER_RAWSOCKETS}" == "True" ] || [ "${ARKSERVER_RAWSOCKETS}" == "true" ]; then
 	COMMANDLINE="${COMMANDLINE}?bRawSockets"
 fi
 
@@ -146,7 +146,7 @@ if [ -n "${ARKSERVER_MODIDS}" ]; then
 fi
 COMMANDLINE="${COMMANDLINE}?RCONEnabled=${ARKSERVER_RCONENABLED}"
 
-if [ "${ARKSERVER_RCONENABLED}" == "True" ] || [ "${ARKSERVER_RCONENABLED}" == "true" ]; then
+if [ "${ARKSERVER_RCONENABLED}" == true ] || [ "${ARKSERVER_RCONENABLED}" == "True" ] || [ "${ARKSERVER_RCONENABLED}" == "true" ]; then
 	printlog "[DBUG] Enabling RCONPort ${ARKSERVER_RCONPORT} (Password:$([ -n \"${ARKSERVER_RCONPASSWORD}\" ] && echo '***' || echo 'n/a'))"
         COMMANDLINE="${COMMANDLINE}?RCONPort=${ARKSERVER_RCONPORT}"
         COMMANDLINE="${COMMANDLINE}?ServerAdminPassword=${ARKSERVER_RCONPASSWORD}"

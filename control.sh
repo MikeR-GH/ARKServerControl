@@ -9,7 +9,7 @@ BACKUPS_BASEDIR="Backups"
 : ' >>> SCRIPT-SETUP <<< ' # // DONT CHANGE THE FOLLOWING..
 
 ARKSERVERCONTROL_NAME="ARKServerControl"
-ARKSERVERCONTROL_VERSION="0.2"
+ARKSERVERCONTROL_VERSION="0.2.2"
 
 # Regex
 REGEX_BACKUP_NAME="^[0-9]{4}\-[0-9]{2}\-[0-9]{2}\_[0-9]{2}\-[0-9]{2}\-[0-9]{2}$"
@@ -46,13 +46,6 @@ function dockercmp() { # Params: SERVER COMMAND
 	fi
 
 	return 1
-}
-function dockercmp_all() { # Params: COMMAND
-	for dir in ${SERVERS_BASEDIR}/*; do
-		if isvalidserver "$(basename ${dir})"; then
-			dockercmp "$(basename ${dir})" ${@:1}
-		fi
-	done
 }
 function backupserver() { # Params: SERVER
 	if isvalidserver "${1}"; then
@@ -156,10 +149,29 @@ elif [ "${1}" == "recover" ]; then
 		echo "${COLOR_RED}${COLOR_BOLD}Failed to recover backup ${COLOR_BLUE}${2}${COLOR_RED} / ${COLOR_CYAN}${3}${COLOR_RED}!${COLOR_RESET}"
 	fi
 elif [ "${1}" == "all" ]; then
-	if [[ -z "${@:2}" ]]; then
-		dockercmp_all ps
+	COMMAND="${@:2}"
+	if [ -z "${COMMAND}" ]; then
+		COMMAND="ps"
+	fi
+
+	VALID_SERVERS_COUNT=0
+	for dir in ${SERVERS_BASEDIR}/*; do
+		if isvalidserver "$(basename ${dir})"; then
+			VALID_SERVERS_COUNT=$((${VALID_SERVERS_COUNT} + 1))
+		fi
+	done
+
+	if [ "${VALID_SERVERS_COUNT}" -eq 0 ]; then
+		echo "${COLOR_RED}${COLOR_BOLD}No servers were found.${COLOR_RESET}"
 	else
-		dockercmp_all ${@:2}
+		for dir in ${SERVERS_BASEDIR}/*; do
+			SERVER_NAME="$(basename ${dir})"
+			if isvalidserver "${SERVER_NAME}"; then
+				echo "${COLOR_YELLOW}${COLOR_BOLD}Executing command for server ${COLOR_BLUE}${SERVER_NAME}${COLOR_YELLOW} ..${COLOR_RESET}"
+				dockercmp "${SERVER_NAME}" "${COMMAND}"
+				echo ""
+			fi
+		done
 	fi
 else
 	if ! isvalidserver "${1}"; then

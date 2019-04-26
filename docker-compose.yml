@@ -15,7 +15,7 @@ services:
       - ARKServerFiles:/ARK/Server:rw
       - ../../ClusterTransfers:/ARK/Server/ShooterGame/ClusterTransfers:rw
       - ./Saved:/ARK/Server/ShooterGame/Saved:rw
-      - ./StartupLogs:/ARK/Server/StartupLogs:rw
+      - ./ServiceLogs:/ARK/Server/ServiceLogs:rw
       - ./ConfigOverride:/ARK/Server/ConfigOverride:rw
     ports:
       - ${ARKSERVER_PUBLICIP:?ARKSERVER_PUBLICIP}:${ARKSERVER_PORT:?ARKSERVER_PORT}:${ARKSERVER_PORT:?ARKSERVER_PORT}/udp

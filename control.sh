@@ -183,7 +183,7 @@ else
 
 	if [ "${2}" == "log" ]; then
 		LOG_FILE=""
-		for file in Servers/04Extinction/StartupLogs/*; do
+		for file in Servers/${1}/ServiceLogs/*; do
 			LOG_NAME="$(basename ${file} .log)"
 			if [ -f "${file}" ] && [[ ${LOG_NAME} =~ ${REGEX_LOG_NAME} ]]; then
 				LOG_FILE="${file}"

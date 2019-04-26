@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOG_DIRECTORY="/ARK/Server/StartupLogs"
+LOG_DIRECTORY="/ARK/Server/ServiceLogs"
 LOG_FILE_POINT="/ARK/log_file"
 
 BINDIR=$(dirname "$(readlink -fn "$0")")

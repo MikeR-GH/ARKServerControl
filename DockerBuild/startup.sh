@@ -97,6 +97,11 @@ else
 			printlog "[WARN] Failed to stop Service/ARK-Server"
 		else
 			printlog "[INFO] Service/ARK-Server has been stopped"
+
+			SERVER_EXIT_CODE="$(/ARK/Service/Server/control.sh last-exit-code &>/dev/null; echo ${?})"
+			if [ "${SERVER_EXIT_CODE}" -ne 0 ]; then
+				printlog "[WARN] Service/ARK-Server exited with non-zero exit code ${SERVER_EXIT_CODE}"
+			fi
 		fi
 	fi
 fi

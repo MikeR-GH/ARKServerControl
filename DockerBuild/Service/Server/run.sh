@@ -189,14 +189,14 @@ START_TIME=`date +%s`
 printlog "[DBUG] Executing: ${COMMANDLINE}"
 exec `${COMMANDLINE}`
 ARKSERVER_EXITCODE="${?}"
-TIME_SPENT="$(($(date +%s) - ${START_TIME}))"
+TIME_SPENT_RUNNING="$(($(date +%s) - ${START_TIME}))"
 
 printlog "[INFO] ARK-Server exit code: ${ARKSERVER_EXITCODE}"
 if [ "${ARKSERVER_EXITCODE}" -ne 0 ]; then
 	printlog "[WARN] ARK-Server exited with non-zero code"
 fi
 
-printlog "[INFO] ARK-Server ran for ${RUNNING_TIME} seconds"
-if [ "${TIME_SPENT}" -le 60 ]; then
+printlog "[INFO] ARK-Server ran for ${TIME_SPENT_RUNNING} seconds"
+if [ "${TIME_SPENT_RUNNING}" -le 60 ]; then
 	printlog "[WARN] ARK-Server may failed to start"
 fi

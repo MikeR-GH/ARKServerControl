@@ -33,12 +33,12 @@ RUN set -x \
 
 	# Installing Control.Sh for the Server-Service
 	&& mkdir -p /ARK/Service/Server \
-	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.6.2/control.sh" -o /ARK/Service/Server/control.sh \
+	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.8.1/control.sh" -o /ARK/Service/Server/control.sh \
 	&& chmod +x /ARK/Service/Server/control.sh \
 
 	# Installing Control.Sh for the Restart-Service
 	&& mkdir -p /ARK/Service/Restart \
-	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.6.2/control.sh" -o /ARK/Service/Restart/control.sh \
+	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.8.1/control.sh" -o /ARK/Service/Restart/control.sh \
 	&& chmod +x /ARK/Service/Restart/control.sh \
 
 	# Cleanup

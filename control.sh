@@ -9,10 +9,11 @@ BACKUPS_BASEDIR="Backups"
 : ' >>> SCRIPT-SETUP <<< ' # // DONT CHANGE THE FOLLOWING..
 
 ARKSERVERCONTROL_NAME="ARKServerControl"
-ARKSERVERCONTROL_VERSION="0.2.2"
+ARKSERVERCONTROL_VERSION="0.3"
 
 # Regex
 REGEX_BACKUP_NAME="^[0-9]{4}\-[0-9]{2}\-[0-9]{2}\_[0-9]{2}\-[0-9]{2}\-[0-9]{2}$"
+REGEX_LOG_NAME="^[0-9]{4}\-[0-9]{2}\-[0-9]{2}\_[0-9]{2}\-[0-9]{2}\-[0-9]{2}$"
 
 # tput-COLORS
 COLOR_WHITE="$(tput setaf 7 2>/dev/null)"
@@ -67,7 +68,7 @@ function backupserver_all() { # Params:
 echo -e "${COLOR_CYAN}${COLOR_BOLD}===   ${ARKSERVERCONTROL_NAME} v${ARKSERVERCONTROL_VERSION}; Project: ${COLOR_RED}${PROJECT_NAME}${COLOR_CYAN};   ===${COLOR_RESET}\n"
 
 if [ "${1}" == "help" ] || [ "${1}" == "--help" ] || [ -z "${1}" ]; then
-	echo "${COLOR_WHITE}${COLOR_BOLD}${0} [--help|list|build|backup [list <?Servername>|all|<Servername>]|recover <Servername> <Backup>|[all|<Servername>] <docker-compose command>]${COLOR_RESET}"
+	echo "${COLOR_WHITE}${COLOR_BOLD}${0} [--help|list|build|backup [list <?Servername>|all|<Servername>]|recover <Servername> <Backup>|[<Servername> log [?follow|f]|[all|<Servername>] <docker-compose command>]]${COLOR_RESET}"
 elif [ "${1}" == "list" ]; then
 	echo "${COLOR_WHITE}${COLOR_BOLD}List of all Servers:${COLOR_RESET}"
 	for dir in ${SERVERS_BASEDIR}/*; do
@@ -180,9 +181,32 @@ else
 		exit 1
 	fi
 
-	if [[ -z "${@:2}" ]]; then
-		dockercmp ${1} ps
+	if [ "${2}" == "log" ]; then
+		LOG_FILE=""
+		for file in Servers/04Extinction/StartupLogs/*; do
+			LOG_NAME="$(basename ${file} .log)"
+			if [ -f "${file}" ] && [[ ${LOG_NAME} =~ ${REGEX_LOG_NAME} ]]; then
+				LOG_FILE="${file}"
+			fi
+		done
+		unset -v LOG_NAME
+
+		if [ -z "${LOG_FILE}" ]; then
+			echo "${COLOR_ÝELLOW}${COLOR_BOLD}No log found.${COLOR_RESET}"
+		else
+			echo "${COLOR_GREEN}${COLOR_BOLD}Displaying Log '${COLOR_CYAN}$(basename ${LOG_FILE} .log)${COLOR_GREEN}'..${COLOR_RESET}"
+
+			if [ "${3}" == "follow" ] || [ "${3}" == "f" ]; then
+				tail -f -n 100 "${LOG_FILE}" |less
+			else
+				tail -n 100 "${LOG_FILE}" |less
+			fi
+		fi
 	else
-		dockercmp ${1} ${@:2}
+		if [[ -z "${@:2}" ]]; then
+			dockercmp ${1} ps
+		else
+			dockercmp ${1} ${@:2}
+		fi
 	fi
 fi

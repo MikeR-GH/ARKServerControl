@@ -37,6 +37,15 @@ COLOR_RESET="$(tput sgr0 2>/dev/null)"
 BINDIR=$(dirname "$(readlink -fn "$0")")
 cd "$BINDIR"
 
+function rootdir() {
+	if [ -n "${1}" ]; then
+		ROOTDIR="${1}"
+		until [ "$(dirname ${ROOTDIR})" == "/" ] || [ "$(dirname ${ROOTDIR})" == "." ]; do
+			ROOTDIR="$(dirname ${ROOTDIR})"
+		done
+	fi
+	echo "${ROOTDIR}"
+}
 function isvalidserver() { # Params: SERVER
 	[ -f "${SERVERS_BASEDIR}/${1}/.env" ]
 }
@@ -50,8 +59,8 @@ function dockercmp() { # Params: SERVER COMMAND
 }
 function backupserver() { # Params: SERVER
 	if isvalidserver "${1}"; then
-		mkdir -p "${BACKUPS_BASEDIR}/${1}"
-		tar -zcvf "${BACKUPS_BASEDIR}/${1}/`date +'%Y-%m-%d_%H-%M-%S'`.tar.gz" -C "${SERVERS_BASEDIR}" "${1}"
+		mkdir -p "${SERVERS_BASEDIR}/${1}/${BACKUPS_BASEDIR}"
+		tar -zcvf "${SERVERS_BASEDIR}/${1}/${BACKUPS_BASEDIR}/`date +'%Y-%m-%d_%H-%M-%S'`.tar.gz" -C "${SERVERS_BASEDIR}" --exclude "${1}/${BACKUPS_BASEDIR}" "${1}"
 		return ${?}
 	fi
 
@@ -59,8 +68,9 @@ function backupserver() { # Params: SERVER
 }
 function backupserver_all() { # Params:
 	for dir in ${SERVERS_BASEDIR}/*; do
-		if isvalidserver "$(basename ${dir})"; then
-			backupserver "$(basename ${dir})"
+		local SERVER_NAME="$(basename ${dir})"
+		if isvalidserver "${SERVER_NAME}"; then
+			backupserver "${SERVER_NAME}"
 		fi
 	done
 }
@@ -83,32 +93,27 @@ elif [ "${1}" == "backup" ]; then
 		BACKEDUPSERVERS=0
 		BACKUPSINTOTAL=0
 
-		for dir in ${BACKUPS_BASEDIR}/*; do
-			if [ ! -d "${dir}" ]; then
-				continue
-			fi
-			if [ -z "${3}" ] || [ "$(basename ${dir})" == "${3}" ]; then
+		for dir in ${SERVERS_BASEDIR}/*; do
+			SERVER_NAME="$(basename ${dir})"
+			if isvalidserver "${SERVER_NAME}" && ([ -z "${3}" ] || [ "${SERVER_NAME}" == "${3}" ]); then
 				BACKEDUPSERVERS=$((${BACKEDUPSERVERS} + 1))
-				BACKUPSINTOTAL=$((${BACKUPSINTOTAL} + $(find ${dir}/*.tar.gz -maxdepth 0 -type f | wc -l)))
+				BACKUPSINTOTAL=$((${BACKUPSINTOTAL} + $(find ${dir}/${BACKUPS_BASEDIR}/*.tar.gz -maxdepth 0 -type f | wc -l)))
 			fi
 		done
 
 		echo "${COLOR_WHITE}${COLOR_BOLD}${BACKUPSINTOTAL} Backups / ${BACKEDUPSERVERS} Servers:"
 
-		for dir in ${BACKUPS_BASEDIR}/*; do
-			if [ ! -d "${dir}" ]; then
-				continue
-			fi
-
-			if [ -z "${3}" ] || [ "$(basename ${dir})" == "${3}" ]; then
-				echo "${COLOR_WHITE}${COLOR_BOLD}  - ${COLOR_BLUE}$(basename ${dir})${COLOR_RESET}"
-				for file in ${dir}/*.tar.gz; do
+		for dir in ${SERVERS_BASEDIR}/*; do
+			SERVER_NAME="$(basename ${dir})"
+			if isvalidserver "${SERVER_NAME}" && ([ -z "${3}" ] || [ "${SERVER_NAME}" == "${3}" ]); then
+				echo "${COLOR_WHITE}${COLOR_BOLD}  - ${COLOR_BLUE}${SERVER_NAME}${COLOR_RESET}"
+				for file in ${dir}/${BACKUPS_BASEDIR}/*.tar.gz; do
 					if [ ! -f "${file}" ]; then
 						continue
 					fi
 					BACKUP_NAME="$(basename ${file} .tar.gz)"
 					if [[ ${BACKUP_NAME} =~ ${REGEX_BACKUP_NAME} ]]; then
-						echo "${COLOR_WHITE}${COLOR_BOLD}    - ${COLOR_CYAN}$(basename ${file} .tar.gz)${COLOR_RESET}"
+						echo "${COLOR_WHITE}${COLOR_BOLD}    - ${COLOR_CYAN}${BACKUP_NAME}${COLOR_RESET}"
 					fi
 				done
 			fi
@@ -135,15 +140,34 @@ elif [ "${1}" == "recover" ]; then
 		exit 1
 	fi
 
-	if [ ! -f "${BACKUPS_BASEDIR}/${2}/${3}.tar.gz" ]; then
+	if [ ! -f "${SERVERS_BASEDIR}/${2}/${BACKUPS_BASEDIR}/${3}.tar.gz" ]; then
 		echo "${COLOR_RED}${COLOR_BOLD}Backup '${3}' does not exist.${COLOR_RESET}"
 		exit 1
 	fi
 
 	echo "${COLOR_YELLOW}${COLOR_BOLD}Deleting current server files of ${COLOR_BLUE}${2}${COLOR_YELLOW}..${COLOR_RESET}"
-	rm -rf ${SERVERS_BASEDIR}/${2} &>/dev/null
+	DID_REMOVE_FILES=false
+	for dir in ${SERVERS_BASEDIR}/${2}/*; do
+		if [ "$(basename ${dir})" != "$(rootdir ${BACKUPS_BASEDIR})" ]; then
+			echo "${COLOR_RED}${COLOR_BOLD}Removing${COLOR_YELLOW} ${dir}${COLOR_RESET}"
+			rm -rf ${dir} &>/dev/null
+			DID_REMOVE_FILES=true
+		fi
+	done
+	if [ "${DID_REMOVE_FILES}" == false ]; then
+		echo "${COLOR_YELLOW}${COLOR_BOLD}No files were removed.${COLOR_RESET}"
+	fi
+
+	DIRS_IN_ARCHIVE="$(tar --exclude="*/*" -tf "Servers/05Test/Backups/2019-04-27_07-43-53.tar.gz")"
+	DIRS_IN_ARCHIVE_COUNT="$(echo "${DIRS_IN_ARCHIVE}" | wc -l)"
+	if [ "${DIRS_IN_ARCHIVE_COUNT}" -ne 1 ] &>/dev/null; then
+		echo "${COLOR_RED}${COLOR_BOLD}Failed to determine the Server directory within the Backup.${COLOR_RESET}"
+		exit 1
+	fi
+	BACKUP_SERVER_DIRNAME="$(basename ${DIRS_IN_ARCHIVE})"
+
 	echo "${COLOR_GREEN}${COLOR_BOLD}Recovering backup ${COLOR_CYAN}${3}${COLOR_GREEN}..${COLOR_RESET}"
-	tar -zxvf "${BACKUPS_BASEDIR}/${2}/${3}.tar.gz" -C "${SERVERS_BASEDIR}"
+	tar -zxvf "${SERVERS_BASEDIR}/${2}/${BACKUPS_BASEDIR}/${3}.tar.gz" -C "${SERVERS_BASEDIR}/${2}" "${BACKUP_SERVER_DIRNAME}" --strip-components=1
 	if [ "${?}" -eq 0 ]; then
 		echo "${COLOR_GREEN}${COLOR_BOLD}Successfully recovered backup ${COLOR_BLUE}${2}${COLOR_GREEN} / ${COLOR_CYAN}${3}${COLOR_GREEN}!${COLOR_RESET}"
 	else

@@ -1,5 +1,7 @@
 FROM ubuntu:18.04
 
+COPY ./CPP_StopServer /ARK/Service/Server/CPP_StopServer
+
 RUN set -x \
 	&& apt-get update \
 	&& apt-get install --yes --no-install-recommends --no-install-suggests \
@@ -10,6 +12,9 @@ RUN set -x \
 		sudo \
 		screen \
 		locales \
+		cmake \
+		make \
+		g++ \
 
 	# Install Locales and set it to en_US.UTF-8
     && sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
@@ -33,17 +38,26 @@ RUN set -x \
 
 	# Installing Control.Sh for the Server-Service
 	&& mkdir -p /ARK/Service/Server \
-	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.8.1/control.sh" -o /ARK/Service/Server/control.sh \
+	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.8.4/control.sh" -o /ARK/Service/Server/control.sh \
 	&& chmod +x /ARK/Service/Server/control.sh \
 
 	# Installing Control.Sh for the Restart-Service
 	&& mkdir -p /ARK/Service/Restart \
-	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.8.1/control.sh" -o /ARK/Service/Restart/control.sh \
+	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.8.4/control.sh" -o /ARK/Service/Restart/control.sh \
 	&& chmod +x /ARK/Service/Restart/control.sh \
+
+	&& mkdir -p /ARK/Service/Server/build \
+	&& cd /ARK/Service/Server/build \
+	&& cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release -G 'Unix Makefiles' /ARK/Service/Server/CPP_StopServer \
+	&& make -j4 \
+	&& cd .. \
+	&& cp build/cpp_stopserver ./stoparkserver \
+	&& rm -rf ./build \
 
 	# Cleanup
 	&& apt-get clean autoclean \
-	&& apt-get autoremove -y \
+	&& apt-get remove --yes cmake g++ \
+	&& apt-get autoremove --yes \
 	&& rm -rf /var/lib/apt/lists/*
 
 COPY ./sysctl.conf /etc/sysctl.conf

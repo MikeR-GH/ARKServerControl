@@ -349,7 +349,7 @@ int stoparkserver(std::string remote_addr, int32_t remote_port, std::string pass
 
 int main(int argc, char const *argv[])
 {
-    if (argc <= 1 || (argc == 2 && strcmp(argv[1], "--help"))) {
+    if (argc <= 1 || (argc == 2 && strcmp(argv[1], "--help") == 0)) {
         if (argc <= 1) {
             std::cout << "Error: Missing first argument. IPv4-Address and Port must be given. [IP:PORT]" << std::endl;
             return 1;

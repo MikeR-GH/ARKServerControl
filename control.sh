@@ -9,7 +9,7 @@ BACKUPS_BASEDIR="Backups"
 : ' >>> SCRIPT-SETUP <<< ' # // DONT CHANGE THE FOLLOWING..
 
 ARKSERVERCONTROL_NAME="ARKServerControl"
-ARKSERVERCONTROL_VERSION="0.5.1"
+ARKSERVERCONTROL_VERSION="0.5.2"
 
 # Regex
 REGEX_BACKUP_NAME="^[0-9]{4}\-[0-9]{2}\-[0-9]{2}\_[0-9]{2}\-[0-9]{2}\-[0-9]{2}$"
@@ -81,12 +81,16 @@ function backupserver_all() { # Params:
 echo -e "${COLOR_CYAN}${COLOR_BOLD}===   ${ARKSERVERCONTROL_NAME} v${ARKSERVERCONTROL_VERSION}; Project: ${COLOR_RED}${PROJECT_NAME}${COLOR_CYAN};   ===${COLOR_RESET}\n"
 
 if [ "${1}" == "help" ] || [ "${1}" == "--help" ] || [ -z "${1}" ]; then
-	echo "${COLOR_WHITE}${COLOR_BOLD}${0} [--help|list|log <Servername> [?follow|f]|info <?Servername> [?--profile-url|--url]|build|backup [list <?Servername>|all|<Servername>]|recover <Servername> <Backup>|[all|<Servername>] <docker-compose command>]]${COLOR_RESET}"
+	echo "${COLOR_WHITE}${COLOR_BOLD}${0} [--help|list <Servername>|log <Servername> [?follow|f]|info <?Servername> [?--profile-url|--url]|build|backup [list <?Servername>|all|<Servername>]|recover <Servername> <Backup>|[all|<Servername>] <docker-compose command>]]${COLOR_RESET}"
 elif [ "${1}" == "list" ]; then
-	echo "${COLOR_WHITE}${COLOR_BOLD}List of all Servers:${COLOR_RESET}"
+	echo "${COLOR_WHITE}${COLOR_BOLD}Serverlist:${COLOR_RESET}"
 	for dir in ${SERVERS_BASEDIR}/*; do
-		if isvalidserver "$(basename ${dir})"; then
-			echo "${COLOR_WHITE}${COLOR_BOLD}  - ${COLOR_BLUE}$(basename $dir)${COLOR_RESET}"
+		SERVER_NAME="$(basename ${dir})"
+		if isvalidserver "${SERVER_NAME}" && ([ -z "${2}" ] || [ "${SERVER_NAME}" == "${2}" ]); then
+			SERVER_ONLINE=$(isserver "${SERVER_NAME}"; echo "${?}")
+			echo -n "${COLOR_WHITE}${COLOR_BOLD}=> ${COLOR_BLUE}${SERVER_NAME}${COLOR_WHITE}   ("
+			[ "${SERVER_ONLINE}" -eq 0 ] && echo -n "${COLOR_GREEN}Online" || echo -n "${COLOR_RED}Offline"
+			echo "${COLOR_WHITE})${COLOR_RESET}"
 		fi
 	done
 elif [ "${1}" == "info" ]; then

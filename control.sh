@@ -111,7 +111,7 @@ elif [ "${1}" == "info" ]; then
 					if [ "${?}" -ne 0 ]; then
 						echo "${COLOR_RED}${COLOR_BOLD}Error: Failed to initiate player list retrieval${COLOR_RESET}"
 					else
-						echo -n "${DOCKERCMP_RESULT}"
+						echo "${DOCKERCMP_RESULT}" | tr -d '\r'
 					fi
 				fi
 			fi
@@ -134,7 +134,7 @@ elif [ "${1}" == "info" ]; then
 			if [ "${?}" -ne 0 ]; then
 				echo "${COLOR_RED}${COLOR_BOLD}Error: Failed to initiate player list retrieval${COLOR_RESET}"
 			else
-				echo -n "${DOCKERCMP_RESULT}"
+				echo "${DOCKERCMP_RESULT}" | tr -d '\r'
 			fi
 		fi
 	fi

@@ -80,6 +80,8 @@ COPY ./startup.sh /ARK/startup.sh
 # Log
 COPY ./log.sh /ARK/log.sh
 
+# listplayers.sh
+COPY ./Service/Server/listplayers.sh /ARK/Service/Server/listplayers.sh
 # Service: Server
 COPY ./Service/Server/control.cfg /ARK/Service/Server/control.cfg
 COPY ./Service/Server/run.sh /ARK/Service/Server/run.sh

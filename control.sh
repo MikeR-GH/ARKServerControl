@@ -86,6 +86,23 @@ elif [ "${1}" == "list" ]; then
 			echo "${COLOR_WHITE}${COLOR_BOLD}  - ${COLOR_BLUE}$(basename $dir)${COLOR_RESET}"
 		fi
 	done
+elif [ "${1}" == "info" ]; then
+	if [ -n "${2}" ] || [ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]; then
+			for dir in ${SERVERS_BASEDIR}/*; do
+				SERVER_NAME="$(basename ${dir})"
+				if isvalidserver "{SERVER_NAME}"; then
+					dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]) && echo "${2}")"
+				fi
+			done
+	else
+		if ! isvalidserver "${2}"; then
+			echo "${COLOR_RED}${COLOR_BOLD}${1} is not a valid server!${COLOR_RESET}"
+			echo "${COLOR_WHITE}${COLOR_BOLD}i.e. the server directory must contain a .env-file.${COLOR_RESET}"
+			exit 1
+		fi
+
+		dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${3}" == "--profile-url" ] || [ "${3}" == "--url" ]) && echo "${3}")"
+	fi
 elif [ "${1}" == "build" ]; then
 	 docker build --rm $(if [ "${2}" == "no-cache" ]; then echo "--no-cache"; fi) -t arksurvivalevolved DockerBuild/
 elif [ "${1}" == "backup" ]; then

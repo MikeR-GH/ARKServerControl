@@ -1,6 +1,7 @@
 FROM ubuntu:18.04
 
 COPY ./CPP_StopServer /ARK/Service/Server/CPP_StopServer
+COPY ./CPP_ListPlayers /ARK/Service/Server/CPP_ListPlayers
 
 RUN set -x \
 	&& apt-get update \
@@ -46,12 +47,22 @@ RUN set -x \
 	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.8.4/control.sh" -o /ARK/Service/Restart/control.sh \
 	&& chmod +x /ARK/Service/Restart/control.sh \
 
+	# Build CPP_StopServer
 	&& mkdir -p /ARK/Service/Server/build \
 	&& cd /ARK/Service/Server/build \
 	&& cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release -G 'Unix Makefiles' /ARK/Service/Server/CPP_StopServer \
 	&& make -j4 \
 	&& cd .. \
 	&& cp build/cpp_stopserver ./stoparkserver \
+	&& rm -rf ./build \
+
+	# Build CPP_ListPlayers
+	&& mkdir -p /ARK/Service/Server/build \
+	&& cd /ARK/Service/Server/build \
+	&& cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release -G 'Unix Makefiles' /ARK/Service/Server/CPP_ListPlayers \
+	&& make -j4 \
+	&& cd .. \
+	&& cp build/cpp_listplayers ./listplayers \
 	&& rm -rf ./build \
 
 	# Cleanup

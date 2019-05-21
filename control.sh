@@ -105,7 +105,15 @@ elif [ "${1}" == "info" ]; then
 				echo -n "${COLOR_WHITE}${COLOR_BOLD}=> ${COLOR_BLUE}${SERVER_NAME}${COLOR_WHITE}   ("
 				[ "${SERVER_ONLINE}" -eq 0 ] && echo -n "${COLOR_GREEN}Online" || echo -n "${COLOR_RED}Offline"
 				echo "${COLOR_WHITE})${COLOR_RESET}"
-				[ "${SERVER_ONLINE}" -eq 0 ] && dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]) && echo "${2}")"
+
+				if [ "${SERVER_ONLINE}" -eq 0 ]; then
+					DOCKERCMP_RESULT="$(dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]) && echo "${2}")")"
+					if [ "${?}" -ne 0 ]; then
+						echo "${COLOR_RED}${COLOR_BOLD}Error: Failed to initiate player list retrieval${COLOR_RESET}"
+					else
+						echo -n "${DOCKERCMP_RESULT}"
+					fi
+				fi
 			fi
 		done
 	else
@@ -121,7 +129,14 @@ elif [ "${1}" == "info" ]; then
 		[ "${SERVER_ONLINE}" -eq 0 ] && echo -n "${COLOR_GREEN}Online" || echo -n "${COLOR_RED}Offline"
 		echo "${COLOR_WHITE})${COLOR_RESET}"
 
-		[ "${SERVER_ONLINE}" -eq 0 ] && dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${3}" == "--profile-url" ] || [ "${3}" == "--url" ]) && echo "${3}")"
+		if [ "${SERVER_ONLINE}" -eq 0 ]; then
+			DOCKERCMP_RESULT="$(dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${3}" == "--profile-url" ] || [ "${3}" == "--url" ]) && echo "${3}")")"
+			if [ "${?}" -ne 0 ]; then
+				echo "${COLOR_RED}${COLOR_BOLD}Error: Failed to initiate player list retrieval${COLOR_RESET}"
+			else
+				echo -n "${DOCKERCMP_RESULT}"
+			fi
+		fi
 	fi
 elif [ "${1}" == "build" ]; then
 	 docker build --rm $(if [ "${2}" == "no-cache" ]; then echo "--no-cache"; fi) -t arksurvivalevolved DockerBuild/

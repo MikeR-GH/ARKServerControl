@@ -81,7 +81,7 @@ function backupserver_all() { # Params:
 echo -e "${COLOR_CYAN}${COLOR_BOLD}===   ${ARKSERVERCONTROL_NAME} v${ARKSERVERCONTROL_VERSION}; Project: ${COLOR_RED}${PROJECT_NAME}${COLOR_CYAN};   ===${COLOR_RESET}\n"
 
 if [ "${1}" == "help" ] || [ "${1}" == "--help" ] || [ -z "${1}" ]; then
-	echo "${COLOR_WHITE}${COLOR_BOLD}${0} [--help|list|build|backup [list <?Servername>|all|<Servername>]|recover <Servername> <Backup>|[<Servername> log [?follow|f]|[all|<Servername>] <docker-compose command>]]${COLOR_RESET}"
+	echo "${COLOR_WHITE}${COLOR_BOLD}${0} [--help|list|log <Servername> [?follow|f]|build|backup [list <?Servername>|all|<Servername>]|recover <Servername> <Backup>|[all|<Servername>] <docker-compose command>]]${COLOR_RESET}"
 elif [ "${1}" == "list" ]; then
 	echo "${COLOR_WHITE}${COLOR_BOLD}List of all Servers:${COLOR_RESET}"
 	for dir in ${SERVERS_BASEDIR}/*; do
@@ -136,6 +136,34 @@ elif [ "${1}" == "info" ]; then
 			else
 				echo -n "${DOCKERCMP_RESULT}"
 			fi
+		fi
+	fi
+elif [ "${1}" == "log" ]; then
+	SERVER_NAME="${2}"
+	if ! isvalidserver "${SERVER_NAME}"; then
+		echo "${COLOR_RED}${COLOR_BOLD}${1} is not a valid server!${COLOR_RESET}"
+		echo "${COLOR_WHITE}${COLOR_BOLD}i.e. the server directory must contain a .env-file.${COLOR_RESET}"
+		exit 1
+	fi
+
+	LOG_FILE=""
+	for file in Servers/${SERVER_NAME}/ServiceLogs/*; do
+		LOG_NAME="$(basename ${file} .log)"
+		if [ -f "${file}" ] && [[ ${LOG_NAME} =~ ${REGEX_LOG_NAME} ]]; then
+			LOG_FILE="${file}"
+		fi
+	done
+	unset -v LOG_NAME
+
+	if [ -z "${LOG_FILE}" ]; then
+		echo "${COLOR_ÝELLOW}${COLOR_BOLD}No log found.${COLOR_RESET}"
+	else
+		echo "${COLOR_GREEN}${COLOR_BOLD}Displaying Log '${COLOR_CYAN}$(basename ${LOG_FILE} .log)${COLOR_GREEN}'..${COLOR_RESET}"
+
+		if [ "${3}" == "follow" ] || [ "${3}" == "f" ]; then
+			tail -f -n 100 "${LOG_FILE}" |less
+		else
+			tail -n 100 "${LOG_FILE}" |less
 		fi
 	fi
 elif [ "${1}" == "build" ]; then
@@ -257,32 +285,9 @@ else
 		exit 1
 	fi
 
-	if [ "${2}" == "log" ]; then
-		LOG_FILE=""
-		for file in Servers/${1}/ServiceLogs/*; do
-			LOG_NAME="$(basename ${file} .log)"
-			if [ -f "${file}" ] && [[ ${LOG_NAME} =~ ${REGEX_LOG_NAME} ]]; then
-				LOG_FILE="${file}"
-			fi
-		done
-		unset -v LOG_NAME
-
-		if [ -z "${LOG_FILE}" ]; then
-			echo "${COLOR_ÝELLOW}${COLOR_BOLD}No log found.${COLOR_RESET}"
-		else
-			echo "${COLOR_GREEN}${COLOR_BOLD}Displaying Log '${COLOR_CYAN}$(basename ${LOG_FILE} .log)${COLOR_GREEN}'..${COLOR_RESET}"
-
-			if [ "${3}" == "follow" ] || [ "${3}" == "f" ]; then
-				tail -f -n 100 "${LOG_FILE}" |less
-			else
-				tail -n 100 "${LOG_FILE}" |less
-			fi
-		fi
+	if [[ -z "${@:2}" ]]; then
+		dockercmp ${1} ps
 	else
-		if [[ -z "${@:2}" ]]; then
-			dockercmp ${1} ps
-		else
-			dockercmp ${1} ${@:2}
-		fi
+		dockercmp ${1} ${@:2}
 	fi
 fi

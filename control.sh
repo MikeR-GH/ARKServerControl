@@ -111,12 +111,14 @@ elif [ "${1}" == "info" ]; then
 				echo "${COLOR_WHITE})${COLOR_RESET}"
 
 				if [ "${SERVER_ONLINE}" -eq 0 ]; then
-					DOCKERCMP_RESULT="$(dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]) && echo "${2}")")"
-					if [ "${?}" -ne 0 ]; then
+					DOCKERCMP_RESULT="$(dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]) && echo "${2}")" | tr -d '\r')"
+
+					if [ -n "$(echo "${DOCKERCMP_RESULT}" | grep 'stat /ARK/Service/Server/listplayers.sh: no such file or directory')" ]; then
 						echo "${COLOR_RED}${COLOR_BOLD}Error: Failed to initiate player list retrieval${COLOR_RESET}"
-					else
-						echo "${DOCKERCMP_RESULT}" | tr -d '\r'
+						exit 1
 					fi
+
+					echo "${DOCKERCMP_RESULT}"
 				fi
 			fi
 		done
@@ -134,12 +136,14 @@ elif [ "${1}" == "info" ]; then
 		echo "${COLOR_WHITE})${COLOR_RESET}"
 
 		if [ "${SERVER_ONLINE}" -eq 0 ]; then
-			DOCKERCMP_RESULT="$(dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${3}" == "--profile-url" ] || [ "${3}" == "--url" ]) && echo "${3}")")"
-			if [ "${?}" -ne 0 ]; then
+			DOCKERCMP_RESULT="$(dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${3}" == "--profile-url" ] || [ "${3}" == "--url" ]) && echo "${3}")" | tr -d '\r')"
+
+			if [ -n "$(echo "${DOCKERCMP_RESULT}" | grep 'stat /ARK/Service/Server/listplayers.sh: no such file or directory')" ]; then
 				echo "${COLOR_RED}${COLOR_BOLD}Error: Failed to initiate player list retrieval${COLOR_RESET}"
-			else
-				echo "${DOCKERCMP_RESULT}" | tr -d '\r'
+				exit 1
 			fi
+
+			echo "${DOCKERCMP_RESULT}"
 		fi
 	fi
 elif [ "${1}" == "log" ]; then

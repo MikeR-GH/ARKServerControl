@@ -24,6 +24,8 @@ COLOR_BOLD="$(tput bold 2>/dev/null)"
 #COLOR_REVERSE="$(tput rev 2>/dev/null)"
 #COLOR_INVISIBLE="$(tput invis 2>/dev/null)"
 
+COLOR_RESET="$(tput sgr0 2>/dev/null)"
+
 if [ -f "${CONFIG_FILE}" ]; then
 	eval "`. ${CONFIG_FILE}&>/dev/null
 	[ -v ARKSERVER_RCONENABLED ] && declare -p ARKSERVER_RCONENABLED 2>/dev/null
@@ -52,7 +54,7 @@ done <<< "${PLAYERS_LIST}"
 
 [ "${PLAYER_COUNT}" -le 0 ] && echo -n "${COLOR_WHITE}" || echo -n "${COLOR_GREEN}"
 echo -n "${COLOR_BOLD}${PLAYER_COUNT}${COLOR_WHITE}"
-[ "${ARKSERVER_MAXPLAYERS}" -eq "${ARKSERVER_MAXPLAYERS}" ] &>/dev/null && echo " / ${ARKSERVER_MAXPLAYERS}"
+[ "${ARKSERVER_MAXPLAYERS}" -eq "${ARKSERVER_MAXPLAYERS}" ] &>/dev/null && echo -n " / ${ARKSERVER_MAXPLAYERS}"
 echo " Players${COLOR_RESET}"
 
-echo -n "${COLOR_WHITE}${COLOR_BOLD}${PLAYERS_LIST}${COLOR_RESET}"
+echo "${COLOR_WHITE}${COLOR_BOLD}${PLAYERS_LIST}${COLOR_RESET}"

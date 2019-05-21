@@ -49,6 +49,9 @@ function rootdir() {
 function isvalidserver() { # Params: SERVER
 	[ -f "${SERVERS_BASEDIR}/${1}/.env" ]
 }
+function isserver() { # Params: SERVER
+	isvalidserver "${1}" && [ -n "$(dockercmp "${1}" ps -q)" ]
+}
 function dockercmp() { # Params: SERVER COMMAND
 	if isvalidserver "${1}"; then
 		docker-compose -f docker-compose.yml -p ${PROJECT_NAME}_${1} --project-directory ${SERVERS_BASEDIR}/${1} ${@:2}
@@ -87,21 +90,38 @@ elif [ "${1}" == "list" ]; then
 		fi
 	done
 elif [ "${1}" == "info" ]; then
-	if [ -n "${2}" ] || [ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]; then
-			for dir in ${SERVERS_BASEDIR}/*; do
-				SERVER_NAME="$(basename ${dir})"
-				if isvalidserver "{SERVER_NAME}"; then
-					dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]) && echo "${2}")"
+	if [ -z "${2}" ] || [ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]; then
+		counter=0
+		for dir in ${SERVERS_BASEDIR}/*; do
+			SERVER_NAME="$(basename ${dir})"
+			if isvalidserver "${SERVER_NAME}"; then
+				if [ "${counter}" -le 0 ]; then
+					counter=$((${counter}+1))
+				else
+					echo ""
 				fi
-			done
+
+				SERVER_ONLINE=$(isserver "${SERVER_NAME}"; echo "${?}")
+				echo -n "${COLOR_WHITE}${COLOR_BOLD}=> ${COLOR_BLUE}${SERVER_NAME}${COLOR_WHITE}   ("
+				[ "${SERVER_ONLINE}" -eq 0 ] && echo -n "${COLOR_GREEN}Online" || echo -n "${COLOR_RED}Offline"
+				echo "${COLOR_WHITE})${COLOR_RESET}"
+				[ "${SERVER_ONLINE}" -eq 0 ] && dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]) && echo "${2}")"
+			fi
+		done
 	else
-		if ! isvalidserver "${2}"; then
+		SERVER_NAME="${2}"
+		if ! isvalidserver "${SERVER_NAME}"; then
 			echo "${COLOR_RED}${COLOR_BOLD}${1} is not a valid server!${COLOR_RESET}"
 			echo "${COLOR_WHITE}${COLOR_BOLD}i.e. the server directory must contain a .env-file.${COLOR_RESET}"
 			exit 1
 		fi
 
-		dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${3}" == "--profile-url" ] || [ "${3}" == "--url" ]) && echo "${3}")"
+		SERVER_ONLINE=$(isserver "${SERVER_NAME}"; echo "${?}")
+		echo -n "${COLOR_WHITE}${COLOR_BOLD}=> ${COLOR_BLUE}${SERVER_NAME}${COLOR_WHITE}   ("
+		[ "${SERVER_ONLINE}" -eq 0 ] && echo -n "${COLOR_GREEN}Online" || echo -n "${COLOR_RED}Offline"
+		echo "${COLOR_WHITE})${COLOR_RESET}"
+
+		[ "${SERVER_ONLINE}" -eq 0 ] && dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${3}" == "--profile-url" ] || [ "${3}" == "--url" ]) && echo "${3}")"
 	fi
 elif [ "${1}" == "build" ]; then
 	 docker build --rm $(if [ "${2}" == "no-cache" ]; then echo "--no-cache"; fi) -t arksurvivalevolved DockerBuild/

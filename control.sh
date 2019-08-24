@@ -246,7 +246,7 @@ elif [ "${1}" == "recover" ]; then
 		echo "${COLOR_YELLOW}${COLOR_BOLD}No files were removed.${COLOR_RESET}"
 	fi
 
-	DIRS_IN_ARCHIVE="$(tar --exclude="*/*" -tf "Servers/05Test/Backups/2019-04-27_07-43-53.tar.gz")"
+	DIRS_IN_ARCHIVE="$(tar --exclude="*/*" -tf "${SERVERS_BASEDIR}/${2}/${BACKUPS_BASEDIR}/${3}.tar.gz")"
 	DIRS_IN_ARCHIVE_COUNT="$(echo "${DIRS_IN_ARCHIVE}" | wc -l)"
 	if [ "${DIRS_IN_ARCHIVE_COUNT}" -ne 1 ] &>/dev/null; then
 		echo "${COLOR_RED}${COLOR_BOLD}Failed to determine the Server directory within the Backup.${COLOR_RESET}"

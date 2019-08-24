@@ -209,6 +209,12 @@ elif [ "${1}" == "backup" ]; then
 	elif [ "${2}" == "all" ]; then
 		backupserver_all
 	else
+		if ! isvalidserver "${2}"; then
+			echo "${COLOR_RED}${COLOR_BOLD}${2} is not a valid server!${COLOR_RESET}"
+			echo "${COLOR_WHITE}${COLOR_BOLD}i.e. the server directory must contain a .env-file.${COLOR_RESET}"
+			exit 1
+		fi
+
 		backupserver "${2}"
 	fi
 elif [ "${1}" == "recover" ]; then
@@ -218,7 +224,7 @@ elif [ "${1}" == "recover" ]; then
 	fi
 
 	if ! isvalidserver "${2}"; then
-                echo "${COLOR_RED}${COLOR_BOLD}${1} is not a valid server!${COLOR_RESET}"
+                echo "${COLOR_RED}${COLOR_BOLD}${2} is not a valid server!${COLOR_RESET}"
                 echo "${COLOR_WHITE}${COLOR_BOLD}i.e. the server directory must contain a .env-file.${COLOR_RESET}"
                 exit 1
         fi

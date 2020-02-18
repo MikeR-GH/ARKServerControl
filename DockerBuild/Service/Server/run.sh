@@ -79,6 +79,15 @@ fi
 if [ -d "${CONFIG_OVERRIDE_DIRECTORY}" ]; then
 	printlog "[DBUG] Preparing Configuration-Overrides"
 
+	if [ ! -d "${CONFIG_DIRECTORY}" ]; then
+		mkdir -p "${CONFIG_DIRECTORY}"
+		if [ "${?}" -ne 0 ] || [ ! -d "${CONFIG_DIRECTORY}" ]; then
+			printlog "[WARN] Failed to create Configuration-Folder"
+		else
+			printlog "[DBUG] Created Configuration-Folder"
+		fi
+	fi
+
 	for file in ${CONFIG_OVERRIDE_DIRECTORY}/*; do
 		if [ ! -f "${file}" ]; then
 			continue

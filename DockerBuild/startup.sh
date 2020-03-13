@@ -47,6 +47,8 @@ printlog "[DBUG] Exporting Commandline-Configuration"
 [ -v ARKSERVER_PORT ] && declare -p ARKSERVER_PORT 2>/dev/null >>${CONFIG_FILE}
 [ -v ARKSERVER_QUERYPORT ] && declare -p ARKSERVER_QUERYPORT 2>/dev/null >>${CONFIG_FILE}
 [ -v ARKSERVER_RCONPORT ] && declare -p ARKSERVER_RCONPORT 2>/dev/null >>${CONFIG_FILE}
+[ -v ARKSERVER_ADDITIONALARGUMENTS ] && declare -p ARKSERVER_ADDITIONALARGUMENTS 2>/dev/null >>${CONFIG_FILE}
+[ -v ARKSERVER_ADDITIONALOPTIONS ] && declare -p ARKSERVER_ADDITIONALOPTIONS 2>/dev/null >>${CONFIG_FILE}
 
 STOP_REQUESTED=false
 UNIX_SIGNAL=""

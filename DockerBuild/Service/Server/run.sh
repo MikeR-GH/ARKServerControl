@@ -41,7 +41,9 @@ if [ -f "${CONFIG_FILE}" ]; then
 	[ -v ARKSERVER_RCONPASSWORD ] && declare -p ARKSERVER_RCONPASSWORD 2>/dev/null
 	[ -v ARKSERVER_PORT ] && declare -p ARKSERVER_PORT 2>/dev/null
 	[ -v ARKSERVER_QUERYPORT ] && declare -p ARKSERVER_QUERYPORT 2>/dev/null
-	[ -v ARKSERVER_RCONPORT ] && declare -p ARKSERVER_RCONPORT 2>/dev/null`"
+	[ -v ARKSERVER_RCONPORT ] && declare -p ARKSERVER_RCONPORT 2>/dev/null
+	[ -v ARKSERVER_ADDITIONALARGUMENTS ] && declare -p ARKSERVER_ADDITIONALARGUMENTS 2>/dev/null
+	[ -v ARKSERVER_ADDITIONALOPTIONS ] && declare -p ARKSERVER_ADDITIONALOPTIONS 2>/dev/null`"
 fi
 
 if [ "${ARKSERVER_SKIPUPDATE}" == true ] || [ "${ARKSERVER_SKIPUPDATE}" == "True" ] || [ "${ARKSERVER_SKIPUPDATE}" == "true" ]; then

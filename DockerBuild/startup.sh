@@ -93,7 +93,9 @@ else
 			/ARK/Service/Server/control.sh stop >/dev/null
 		fi
 
-		/ARK/Service/Server/control.sh join 3 >/dev/null
+		STOPPING_STARTED=`date +%s`
+		/ARK/Service/Server/control.sh join 10 >/dev/null
+		printlog "[DBUG] Waited for Service/ARK-Server to close for $(($(date +%s) - ${STOPPING_STARTED})) seconds"
 
 		if /ARK/Service/Server/control.sh status >/dev/null; then
 			printlog "[WARN] Failed to stop Service/ARK-Server"

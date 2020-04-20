@@ -36,7 +36,7 @@ until [ "${STOP_REQUESTED}" == true ]; do
 	CMD_RESULT="$(/ARK/Service/Server/sendcommand.sh ListPlayers)"
 	LAST_EXIT_CODE="${?}"
 
-	if [ "${LAST_EXIT_CODE}" -ne 0 ]; then
+	if [ "${LAST_EXIT_CODE}" -eq 0 ]; then
 		if [ "${CMD_RESULT}" = "No Players Connected" ]; then
 		        PLAYERS_LIST=""
 		else

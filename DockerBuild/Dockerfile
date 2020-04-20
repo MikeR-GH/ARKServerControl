@@ -46,6 +46,11 @@ RUN set -x \
 	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.8.4/control.sh" -o /ARK/Service/Restart/control.sh \
 	&& chmod +x /ARK/Service/Restart/control.sh \
 
+	# Installing Control.Sh for the PauseIdleServer-Service
+	&& mkdir -p /ARK/Service/PauseIdleServer \
+	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.8.4/control.sh" -o /ARK/Service/PauseIdleServer/control.sh \
+	&& chmod +x /ARK/Service/PauseIdleServer/control.sh \
+
 	# Build CPP_SendCommand
 	&& mkdir -p /ARK/Service/Server/build \
 	&& cd /ARK/Service/Server/build \

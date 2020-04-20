@@ -93,8 +93,22 @@ elif [ "${1}" == "list" ]; then
 			echo "${COLOR_WHITE})${COLOR_RESET}"
 		fi
 	done
+elif [ "${1}" == "cmd" ]; then
+	SERVER_NAME="${2}"
+	if ! isvalidserver "${SERVER_NAME}"; then
+		echo "${COLOR_RED}${COLOR_BOLD}${1} is not a valid server!${COLOR_RESET}"
+		echo "${COLOR_WHITE}${COLOR_BOLD}i.e. the server directory must contain a .env-file.${COLOR_RESET}"
+		exit 1
+	fi
+	
+	if [ -z "${3}" ]; then
+		echo "${COLOR_RED}${COLOR_BOLD}No command given${COLOR_RESET}"
+		exit 1
+	fi
+	
+	dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/sendcommand.sh "${3}"
 elif [ "${1}" == "info" ]; then
-	if [ -z "${2}" ] || [ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]; then
+	if [ -z "${2}" ]; then
 		counter=0
 		for dir in ${SERVERS_BASEDIR}/*; do
 			SERVER_NAME="$(basename ${dir})"
@@ -111,7 +125,7 @@ elif [ "${1}" == "info" ]; then
 				echo "${COLOR_WHITE})${COLOR_RESET}"
 
 				if [ "${SERVER_ONLINE}" -eq 0 ]; then
-					DOCKERCMP_RESULT="$(dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${2}" == "--profile-url" ] || [ "${2}" == "--url" ]) && echo "${2}")" | tr -d '\r')"
+					DOCKERCMP_RESULT="$(dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh | tr -d '\r')"
 
 					if [ -n "$(echo "${DOCKERCMP_RESULT}" | grep 'stat /ARK/Service/Server/listplayers.sh: no such file or directory')" ]; then
 						echo "${COLOR_RED}${COLOR_BOLD}Error: Failed to initiate player list retrieval${COLOR_RESET}"
@@ -136,7 +150,7 @@ elif [ "${1}" == "info" ]; then
 		echo "${COLOR_WHITE})${COLOR_RESET}"
 
 		if [ "${SERVER_ONLINE}" -eq 0 ]; then
-			DOCKERCMP_RESULT="$(dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh "$(([ "${3}" == "--profile-url" ] || [ "${3}" == "--url" ]) && echo "${3}")" | tr -d '\r')"
+			DOCKERCMP_RESULT="$(dockercmp "${SERVER_NAME}" exec ARKServer /ARK/Service/Server/listplayers.sh | tr -d '\r')"
 
 			if [ -n "$(echo "${DOCKERCMP_RESULT}" | grep 'stat /ARK/Service/Server/listplayers.sh: no such file or directory')" ]; then
 				echo "${COLOR_RED}${COLOR_BOLD}Error: Failed to initiate player list retrieval${COLOR_RESET}"

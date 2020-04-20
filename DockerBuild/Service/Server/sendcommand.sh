@@ -20,5 +20,5 @@ if ([ "${ARKSERVER_RCONENABLED}" != "True" ] && [ "${ARKSERVER_RCONENABLED}" != 
 	exit 1
 fi
 
-COMMAND_RESULT="$(./sendcommand "127.0.0.1:${ARKSERVER_RCONPORT}" "${ARKSERVER_RCONPASSWORD}" "${1}")"
+./sendcommand "127.0.0.1:${ARKSERVER_RCONPORT}" "${ARKSERVER_RCONPASSWORD}" "${1}"
 exit "${?}"

@@ -35,7 +35,11 @@ if [ "${LAST_EXIT_CODE}" -ne 0 ]; then
 	exit "${LAST_EXIT_CODE}"
 fi
 
-PLAYERS_LIST=${CMD_RESULT}
+if [ "${CMD_RESULT}" = "No Players Connected" ]; then
+	PLAYERS_LIST=""
+else
+	PLAYERS_LIST="${CMD_RESULT}"
+fi
 
 PLAYER_COUNT=0
 while read -r line; do

@@ -81,7 +81,7 @@ function backupserver_all() { # Params:
 echo -e "${COLOR_CYAN}${COLOR_BOLD}===   ${ARKSERVERCONTROL_NAME} v${ARKSERVERCONTROL_VERSION}; Project: ${COLOR_RED}${PROJECT_NAME}${COLOR_CYAN};   ===${COLOR_RESET}\n"
 
 if [ "${1}" == "help" ] || [ "${1}" == "--help" ] || [ -z "${1}" ]; then
-	echo "${COLOR_WHITE}${COLOR_BOLD}${0} [--help|list <Servername>|log <Servername> [?follow|f]|info <?Servername> [?--profile-url|--url]|build|backup [list <?Servername>|all|<Servername>]|recover <Servername> <Backup>|[all|<Servername>] <docker-compose command>]]${COLOR_RESET}"
+	echo "${COLOR_WHITE}${COLOR_BOLD}${0} [--help|list <Servername>|log <Servername> [?follow|f]|info <?Servername>|build|backup [list <?Servername>|all|<Servername>]|recover <Servername> <Backup>|[all|<Servername>] <docker-compose command>]]${COLOR_RESET}"
 elif [ "${1}" == "list" ]; then
 	echo "${COLOR_WHITE}${COLOR_BOLD}Serverlist:${COLOR_RESET}"
 	for dir in ${SERVERS_BASEDIR}/*; do

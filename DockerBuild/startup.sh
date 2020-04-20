@@ -76,7 +76,7 @@ else
 	if [ "${EXIT_CODE_SERVICE_RESTART}" -ne 0 ]; then
 		printlog "[WARM] Failed to start Service/Restart"
 	else
-		if [ "${ARKSERVER_PAUSEIDLESERVER}" == true ]; then
+		if [ "${ARKSERVER_PAUSEIDLESERVER}" == true ] || [ "${ARKSERVER_PAUSEIDLESERVER}" == "True" ] || [ "${ARKSERVER_PAUSEIDLESERVER}" == "true" ]; then
 			printlog "[INFO] Starting Service/PauseIdleServer.."
 			/ARK/Service/PauseIdleServer/control.sh start >/dev/null
 			EXIT_CODE_SERVICE_PAUSEIDLESERVER=${?}

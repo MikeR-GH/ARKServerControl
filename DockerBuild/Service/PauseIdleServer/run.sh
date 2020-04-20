@@ -2,8 +2,6 @@
 
 : ' >>> BASIC-SETUP <<< '
 
-CONFIG_FILE="/ARK/Service/Server/commandline.cfg"
-
 : ' >>> ADVANCED-SETUP <<< '
 
 LOGGER="/ARK/log.sh"
@@ -19,31 +17,6 @@ function printlog() { # Params: MESSAGE
 
 
 : ' >>> SCRIPT <<< '
-
-if [ -f "${CONFIG_FILE}" ]; then
-	printlog "[DBUG] Importing Commandline-Configuration"
-	eval "`. ${CONFIG_FILE}&>/dev/null
-	[ -v ARKSERVER_SKIPUPDATE ] && declare -p ARKSERVER_SKIPUPDATE 2>/dev/null
-	[ -v ARKSERVER_MAP ] && declare -p ARKSERVER_MAP 2>/dev/null
-	[ -v ARKSERVER_RAWSOCKETS ] && declare -p ARKSERVER_RAWSOCKETS 2>/dev/null
-	[ -v ARKSERVER_MAXPLAYERS ] && declare -p ARKSERVER_MAXPLAYERS 2>/dev/null
-	[ -v ARKSERVER_CLUSTERID ] && declare -p ARKSERVER_CLUSTERID 2>/dev/null
-	[ -v ARKSERVER_MODIDS ] && declare -p ARKSERVER_MODIDS 2>/dev/null
-	[ -v ARKSERVER_RCONENABLED ] && declare -p ARKSERVER_RCONENABLED 2>/dev/null
-	[ -v ARKSERVER_RCONPASSWORD ] && declare -p ARKSERVER_RCONPASSWORD 2>/dev/null
-	[ -v ARKSERVER_PORT ] && declare -p ARKSERVER_PORT 2>/dev/null
-	[ -v ARKSERVER_QUERYPORT ] && declare -p ARKSERVER_QUERYPORT 2>/dev/null
-	[ -v ARKSERVER_RCONPORT ] && declare -p ARKSERVER_RCONPORT 2>/dev/null
-	[ -v ARKSERVER_ADDITIONALARGUMENTS ] && declare -p ARKSERVER_ADDITIONALARGUMENTS 2>/dev/null
-	[ -v ARKSERVER_ADDITIONALOPTIONS ] && declare -p ARKSERVER_ADDITIONALOPTIONS 2>/dev/null`"
-fi
-
-if [ ! -v ARKSERVER_RCONENABLED ]; then
-        ARKSERVER_RCONENABLED=False
-fi
-if [ ! -v ARKSERVER_RCONPORT ] && ([ "${ARKSERVER_RCONENABLED}" == true ] || [ "${ARKSERVER_RCONENABLED}" == "True" ] || [ "${ARKSERVER_RCONENABLED}" == "true" ]); then
-        ARKSERVER_RCONPORT=27020
-fi
 
 START_TIME=`date +%s`
 printlog "[DBUG] Started Service/PauseIdleServer"

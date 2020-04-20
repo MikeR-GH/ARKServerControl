@@ -56,12 +56,45 @@ trap "STOP_REQUESTED=true" SIGQUIT
 
 SERVER_PAUSED=false
 
-sleep 600s
+sleep 30s
 printlog "[INFO] Service/PauseIdleServer starts to look for idle states"
 
 until [ "${STOP_REQUESTED}" == true ]; do
-	# @TODO
-	sleep 60s
+	CMD_RESULT="$(/ARK/Service/Server/sendcommand.sh ListPlayers)"
+	LAST_EXIT_CODE="${?}"
+
+	if [ "${LAST_EXIT_CODE}" -ne 0 ]; then
+		if [ "${CMD_RESULT}" = "No Players Connected" ]; then
+		        PLAYERS_LIST=""
+		else
+		        PLAYERS_LIST="${CMD_RESULT}"
+		fi
+
+		PLAYER_COUNT=0
+		while read -r line; do
+		        [ -n "${line}" ] && PLAYER_COUNT=$((${PLAYER_COUNT}+1))
+		done <<< "${PLAYERS_LIST}"
+
+		if [ "${SERVER_PAUSED}" == true ]; then
+			if [ "${PLAYER_COUNT}" -gt 0 ]; then
+				/ARK/Service/Server/sendcommand.sh "SetGlobalPause false" >/dev/null
+				if [ "${?}" -eq 0 ]; then
+					printlog "[INFO] Unpaused Server"
+					SERVER_PAUSED=false
+				fi
+			fi
+		else
+			if [ "${PLAYER_COUNT}" -eq 0 ]; then
+				/ARK/Service/Server/sendcommand.sh "SetGlobalPause true" >/dev/null
+				if [ "${?}" -eq 0 ]; then
+					printlog "[INFO] Paused Server"
+					SERVER_PAUSED=true
+				fi
+			fi
+		fi
+	fi
+
+	sleep 10s
 done
 
 printlog "[INFO] Service/PauseIdleServer ran for ${TIME_SPENT_RUNNING} seconds"

@@ -26,26 +26,16 @@ COLOR_BOLD="$(tput bold 2>/dev/null)"
 
 COLOR_RESET="$(tput sgr0 2>/dev/null)"
 
-if [ -f "${CONFIG_FILE}" ]; then
-	eval "`. ${CONFIG_FILE}&>/dev/null
-	[ -v ARKSERVER_RCONENABLED ] && declare -p ARKSERVER_RCONENABLED 2>/dev/null
-	[ -v ARKSERVER_RCONPASSWORD ] && declare -p ARKSERVER_RCONPASSWORD 2>/dev/null
-	[ -v ARKSERVER_RCONPORT ] && declare -p ARKSERVER_RCONPORT 2>/dev/null`"
-fi
-
-if ([ "${ARKSERVER_RCONENABLED}" != "True" ] && [ "${ARKSERVER_RCONENABLED}" != "true" ] && [ "${ARKSERVER_RCONENABLED}" != true ]) || [ ! -v ARKSERVER_RCONPASSWORD ] || [ ! -v ARKSERVER_RCONPORT ]; then
-	echo "${COLOR_RED}${COLOR_BOLD}Error: RCON is not enabled${COLOR_RESET}"
-	exit 1
-fi
-
-PLAYERS_LIST="$(./listplayers "127.0.0.1:${ARKSERVER_RCONPORT}" "${ARKSERVER_RCONPASSWORD}" "$(([ "${1}" == "--profile-url" ] || [ "${1}" == "--url" ]) && echo "${1}")")"
+CMD_RESULT="$(./sendcommand.sh ListPlayers)"
 LAST_EXIT_CODE="${?}"
 
 if [ "${LAST_EXIT_CODE}" -ne 0 ]; then
-	echo "${PLAYERS_LIST}"
+	echo "${CMD_RESULT}"
 	echo "${COLOR_RED}${COLOR_BOLD}Error: Failed to retreive player list${COLOR_RESET}"
 	exit "${LAST_EXIT_CODE}"
 fi
+
+PLAYERS_LIST=${CMD_RESULT}
 
 PLAYER_COUNT=0
 while read -r line; do

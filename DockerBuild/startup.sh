@@ -49,6 +49,11 @@ printlog "[DBUG] Exporting Commandline-Configuration"
 [ -v ARKSERVER_RCONPORT ] && declare -p ARKSERVER_RCONPORT 2>/dev/null >>${CONFIG_FILE}
 [ -v ARKSERVER_ADDITIONALARGUMENTS ] && declare -p ARKSERVER_ADDITIONALARGUMENTS 2>/dev/null >>${CONFIG_FILE}
 [ -v ARKSERVER_ADDITIONALOPTIONS ] && declare -p ARKSERVER_ADDITIONALOPTIONS 2>/dev/null >>${CONFIG_FILE}
+[ -v ARKSERVER_PAUSEIDLESERVER ] && declare -p ARKSERVER_PAUSEIDLESERVER 2>/dev/null >>${CONFIG_FILE}
+
+if [ ! -v ARKSERVER_PAUSEIDLESERVER ]; then
+	ARKSERVER_PAUSEIDLESERVER=false
+fi
 
 STOP_REQUESTED=false
 UNIX_SIGNAL=""
@@ -71,6 +76,16 @@ else
 	if [ "${EXIT_CODE_SERVICE_RESTART}" -ne 0 ]; then
 		printlog "[WARM] Failed to start Service/Restart"
 	else
+		if [ "${ARKSERVER_PAUSEIDLESERVER}" == true ]; then
+			printlog "[INFO] Starting Service/PauseIdleServer.."
+			/ARK/Service/PauseIdleServer/control.sh start >/dev/null
+			EXIT_CODE_SERVICE_PAUSEIDLESERVER=${?}
+
+			if [ "${EXIT_CODE_SERVICE_PAUSEIDLESERVER}" -ne 0 ]; then
+				printlog "[WARM] Failed to start Service/PauseIdleServer"
+			fi
+		fi
+
 		until [ "${STOP_REQUESTED}" == true ] || ! /ARK/Service/Server/control.sh status >/dev/null; do
 			sleep 10s
 			if ! /ARK/Service/Restart/control.sh status >/dev/null; then

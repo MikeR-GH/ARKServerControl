@@ -1,7 +1,6 @@
 FROM ubuntu:18.04
 
-COPY ./CPP_StopServer /ARK/Service/Server/CPP_StopServer
-COPY ./CPP_ListPlayers /ARK/Service/Server/CPP_ListPlayers
+COPY ./CPP_SendCommand /ARK/Service/Server/CPP_SendCommand
 
 RUN set -x \
 	&& apt-get update \
@@ -47,22 +46,13 @@ RUN set -x \
 	&& curl "https://raw.githubusercontent.com/MikeR-GH/Control.Sh/v0.8.4/control.sh" -o /ARK/Service/Restart/control.sh \
 	&& chmod +x /ARK/Service/Restart/control.sh \
 
-	# Build CPP_StopServer
+	# Build CPP_SendCommand
 	&& mkdir -p /ARK/Service/Server/build \
 	&& cd /ARK/Service/Server/build \
-	&& cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release -G 'Unix Makefiles' /ARK/Service/Server/CPP_StopServer \
+	&& cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release -G 'Unix Makefiles' /ARK/Service/Server/CPP_SendCommand \
 	&& make -j4 \
 	&& cd .. \
-	&& cp build/cpp_stopserver ./stoparkserver \
-	&& rm -rf ./build \
-
-	# Build CPP_ListPlayers
-	&& mkdir -p /ARK/Service/Server/build \
-	&& cd /ARK/Service/Server/build \
-	&& cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release -G 'Unix Makefiles' /ARK/Service/Server/CPP_ListPlayers \
-	&& make -j4 \
-	&& cd .. \
-	&& cp build/cpp_listplayers ./listplayers \
+	&& cp build/cpp_sendcommand ./sendcommand \
 	&& rm -rf ./build \
 
 	# Cleanup
@@ -80,7 +70,8 @@ COPY ./startup.sh /ARK/startup.sh
 # Log
 COPY ./log.sh /ARK/log.sh
 
-# listplayers.sh
+# sendcommand.sh & listplayers.sh
+COPY ./Service/Server/sendcommand.sh /ARK/Service/Server/sendcommand.sh
 COPY ./Service/Server/listplayers.sh /ARK/Service/Server/listplayers.sh
 # Service: Server
 COPY ./Service/Server/control.cfg /ARK/Service/Server/control.cfg
@@ -88,6 +79,9 @@ COPY ./Service/Server/run.sh /ARK/Service/Server/run.sh
 # Service: Restart
 COPY ./Service/Restart/control.cfg /ARK/Service/Restart/control.cfg
 COPY ./Service/Restart/run.sh /ARK/Service/Restart/run.sh
+# Service: PauseIdleServer
+COPY ./Service/PauseIdleServer/control.cfg /ARK/Service/PauseIdleServer/control.cfg
+COPY ./Service/PauseIdleServer/run.sh /ARK/Service/PauseIdleServer/run.sh
 
 # Chown: /ARK
 RUN chown -R steam: /ARK

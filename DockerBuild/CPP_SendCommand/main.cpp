@@ -8,6 +8,24 @@
 #include <string>
 #include <regex>
 
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+static inline std::string trim(std::string s) {
+    ltrim(s);
+    rtrim(s);
+    return s;
+}
+
 bool parseIPPort(std::string ipport, std::string& ip, int32_t& port)
 {
     std::regex regex_base_pattern = std::regex("^([^\\:]*)\\:([^\\:]*)$");
@@ -270,11 +288,10 @@ bool srp_authenticate(int32_t sock, std::string password)
         return false;
     }
     
-    if (recv_packet_id == send_id) {
-        std::cout << "Successfully authenticated" << std::endl;
-    } else if (recv_packet_id == -1) {
+    if (recv_packet_id == -1) {
         std::cout << "Failed to authenticate" << std::endl;
-    } else {
+        return false;
+    } else if (recv_packet_id != send_id) {
         std::cout << "Error: Recieved unexpected/invalid packet id (" << recv_packet_id << ")" << std::endl;
         return false;
     }
@@ -282,7 +299,7 @@ bool srp_authenticate(int32_t sock, std::string password)
     return true;
 }
 
-int stoparkserver(std::string remote_addr, int32_t remote_port, std::string password)
+int sendcommand(std::string remote_addr, int32_t remote_port, std::string password, std::string command)
 {
     // Copy remote_addr to remote_addr_chr
     char remote_addr_chr[remote_addr.size() + 1];
@@ -317,47 +334,23 @@ int stoparkserver(std::string remote_addr, int32_t remote_port, std::string pass
         return 5;
     }
     
-    /* issue command 'saveworld' */
-    std::string* cmd_result1 = srp_sendcommand(sock, "SaveWorld");
+    /* issue command */
+    std::string* cmd_result1 = srp_sendcommand(sock, command);
     if (cmd_result1 == NULL) {
         std::cout << "Failed to issue command" << std::endl;
         close(sock);
         return 6;
-    } else {
-        std::cout << "command: 'SaveWorld'" << std::endl;
-        std::cout << "result: '" << *cmd_result1 << "'" << std::endl;
     }
     
-    /* issue command 'DoExit' */
-    std::string* cmd_result2 = srp_sendcommand(sock, "DoExit");
-    if (cmd_result2 == NULL) {
-        std::cout << "Failed to issue command" << std::endl;
-        close(sock);
-        return 6;
-    } else {
-        std::cout << "command: 'DoExit'" << std::endl;
-        std::cout << "result: '" << *cmd_result2 << "'" << std::endl;
-    }
-    
-    if (close(sock) != 0) {
-        std::cout << "Failed to close connection" << std::endl;
-        std::cout << "Error [" << errno << "] " << strerror(errno) << std::endl;
-    }
-    
+    std::cout << trim(*cmd_result1);
+    close(sock);
     return 0;
 }
 
 int main(int argc, char const *argv[])
 {
-    if (argc <= 1 || (argc == 2 && strcmp(argv[1], "--help") == 0)) {
-        if (argc <= 1) {
-            std::cout << "Error: Missing first argument. IPv4-Address and Port must be given. [IP:PORT]" << std::endl;
-            return 1;
-        }
-        std::cout << argv[0] << " [IP:PORT] [PASSWORD]" << std::endl;
-        return 0;
-    } else if (argc == 2) {
-        std::cout << "Error: Missing second argument. Rcon-Password must be given." << std::endl;
+    if (argc < 4 || strcmp(argv[1], "--help") == 0) {
+        std::cout << "Usage: " << argv[0] << " [IP:PORT] [PASSWORD] [COMMAND]" << std::endl;
         return 1;
     }
     
@@ -367,5 +360,5 @@ int main(int argc, char const *argv[])
         return 1;
     }
     
-    return stoparkserver(addr_ip, addr_port, argv[2]);
+    return sendcommand(addr_ip, addr_port, argv[2], argv[3]);
 }

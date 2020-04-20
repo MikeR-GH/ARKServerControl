@@ -3,6 +3,10 @@
 : '>>> ADVANCED CONFIG <<<'
 CONFIG_FILE="/ARK/Service/Server/commandline.cfg"
 
+: '>>> SCRIPT SETUP <<<'
+BINDIR=$(dirname "$(readlink -fn "$0")")
+cd "$BINDIR"
+
 if [ -f "${CONFIG_FILE}" ]; then
 	eval "`. ${CONFIG_FILE}&>/dev/null
 	[ -v ARKSERVER_RCONENABLED ] && declare -p ARKSERVER_RCONENABLED 2>/dev/null

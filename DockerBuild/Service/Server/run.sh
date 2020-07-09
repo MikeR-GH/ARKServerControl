@@ -78,6 +78,22 @@ if [ ! -h "/ARK/Server/Engine/Binaries/ThirdParty/SteamCMD/Linux" ]; then
 	ln -s /SteamCMD /ARK/Server/Engine/Binaries/ThirdParty/SteamCMD/Linux
 fi
 
+if [ -f "/ARK/Server/ShooterGame/Binaries/Linux/PlayersJoinNoCheckList.txt" ]; then
+	rm "/ARK/Server/ShooterGame/Binaries/Linux/PlayersJoinNoCheckList.txt" &>/dev/null
+	if [ "${?}" -ne 0 ] || [ -f "/ARK/Server/ShooterGame/Binaries/Linux/PlayersJoinNoCheckList.txt" ]; then
+		printlog "[WARN] Failed to remove file 'ShooterGame/Binaries/Linux/PlayersJoinNoCheckList.txt'"
+	fi
+fi
+
+if [ -f "/ARK/Server/ShooterGame/Saved/PlayersJoinNoCheckList.txt" ]; then
+	cp "/ARK/Server/ShooterGame/Saved/PlayersJoinNoCheckList.txt" "/ARK/Server/ShooterGame/Binaries/Linux/PlayersJoinNoCheckList.txt" &>/dev/null
+	if [ "${?}" -ne 0 ] || [ ! -f "/ARK/Server/ShooterGame/Binaries/Linux/PlayersJoinNoCheckList.txt" ]; then
+		printlog "[WARN] Failed to copy file 'Saved/PlayersJoinNoCheckList.txt'"
+	else
+		printlog "[DBUG] Copied file 'Saved/PlayersJoinNoCheckList.txt'"
+	fi
+fi
+
 if [ -d "${CONFIG_OVERRIDE_DIRECTORY}" ]; then
 	printlog "[DBUG] Preparing Configuration-Overrides"
 
@@ -98,13 +114,13 @@ if [ -d "${CONFIG_OVERRIDE_DIRECTORY}" ]; then
 		filename=$(basename ${file})
 
 		if [ -f "${CONFIG_DIRECTORY}/${filename}" ]; then
-			rm ${CONFIG_DIRECTORY}/${filename} &>/dev/null
+			rm "${CONFIG_DIRECTORY}/${filename}" &>/dev/null
 		fi
 
 		if [ "${?}" -ne 0 ] || [ -f "${CONFIG_DIRECTORY}/${filename}" ]; then
 			printlog "[WARN] Failed to remove file '${filename}' for override purpose"
 		else
-			cp ${CONFIG_OVERRIDE_DIRECTORY}/${filename} ${CONFIG_DIRECTORY}/${filename} &>/dev/null
+			cp "${CONFIG_OVERRIDE_DIRECTORY}/${filename}" "${CONFIG_DIRECTORY}/${filename}" &>/dev/null
 			if [ "${?}" -ne 0 ] || [ ! -f "${CONFIG_DIRECTORY}/${filename}" ]; then
 				printlog "[WARN] Failed to copy file '${filename}' for override purpose"
 			else
